@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd src
 # Pack Lambda Functions
 arr_variable=("GetInstances" "GetInstanceTypes" "GetInstanceUtilization" "GetUsage" "StoreRegionalUtilization")
 
