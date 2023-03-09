@@ -1,0 +1,52 @@
+import { CloudWatchClient, PutMetricDataCommand } from "@aws-sdk/client-cloudwatch";
+const client = new CloudWatchClient();
+
+async function putMetric(region, utilization) {
+  const command = new PutMetricDataCommand({
+    MetricData: [
+      {
+        MetricName: "Utilization",
+        Dimensions: [
+          {
+            Name: "region",
+            Value: region,
+          },
+          {
+            Name: "type",
+            Value: "CPU",
+          },
+          {
+            Name: "service",
+            Value: "EC2",
+          },          
+        ],
+        Unit: "None",
+        Value: utilization,
+      },
+    ],
+    Namespace: "Sustainability/KPI",
+  });
+
+ await client.send(command);
+
+}
+
+function aggregate(metrics) {
+    var totalCpus = 0;
+    var sum = 0;
+    for (const metric of metrics) {
+      if (metric.utilization ){
+        totalCpus += metric.vcpus;
+        sum += metric.vcpus * metric.utilization;
+      }
+    }
+    return { utilization: sum / totalCpus, totalCpus };
+}
+
+export const handler = async(event) => {
+    console.log(JSON.stringify(event));
+    const res = aggregate(event.metrics);
+    console.log('utilization: ', res);
+    await putMetric(event.region, res.utilization);
+    return res
+};

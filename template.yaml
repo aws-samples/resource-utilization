@@ -1,0 +1,404 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: ""
+Resources:
+    CloudWatchLogsDeliveryFullAccessPolicy:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            Path: "/service-role/"
+            PolicyDocument: 
+                    Version: "2012-10-17"
+                    Statement: 
+                        Effect: "Allow"
+                        Action: 
+                            - "logs:CreateLogDelivery"
+                            - "logs:GetLogDelivery"
+                            - "logs:UpdateLogDelivery"
+                            - "logs:DeleteLogDelivery"
+                            - "logs:ListLogDeliveries"
+                            - "logs:PutResourcePolicy"
+                            - "logs:DescribeResourcePolicies"
+                            - "logs:DescribeLogGroups"
+                        Resource: "*"
+
+    StepFunctionInvokeLambdasPolicy:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            Path: "/service-role/"
+            PolicyDocument: 
+                Version: "2012-10-17"
+                Statement: 
+                    Effect: "Allow"
+                    Action: "lambda:InvokeFunction"
+                    Resource:
+                        -  !Sub  "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceTypesLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceTypesLambdaFunction}"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetUsageLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetUsageLambdaFunction}"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstancesLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstancesLambdaFunction}"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceUtilizationLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceUtilizationLambdaFunction}"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StoreRegionalUtilizationLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${StoreRegionalUtilizationLambdaFunction}"
+
+    CloudWatchLogsPolicy:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            Path: "/service-role/"
+            PolicyDocument: 
+                Version: "2012-10-17"
+                Statement:
+                  - Sid: CreateLogGroup 
+                    Effect: "Allow"
+                    Action: "logs:CreateLogGroup"
+                    Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+                  - Sid: CreateLogEvents                     
+                    Effect: "Allow"
+                    Action: 
+                        - "logs:CreateLogStream"
+                        - "logs:PutLogEvents"
+                    Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:*"
+
+    AmazonEventBridgeSchedulerExecutionPolicy:
+        Type: "AWS::IAM::ManagedPolicy"
+        Properties:
+            Path: "/service-role/"
+            PolicyDocument: 
+                Version: "2012-10-17"
+                Statement: 
+                    Effect: "Allow"
+                    Action: "states:StartExecution"
+                    Resource: !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:GetUtilization"
+
+    GetInstanceUtilizationLambdaFunction:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Description: "Get Daily average EC2 instance utilization for a specific instance id"
+            FunctionName: "GetInstanceUtilization"
+            Handler: "index.handler"
+            Architectures: 
+              - "x86_64"
+            CodeUri: "lambdas/GetInstanceUtilization.zip"
+            MemorySize: 128
+            Role: !GetAtt GetInstanceUtilizationRole.Arn
+            Runtime: "nodejs18.x"
+            Timeout: 3
+
+    GetInstanceTypesLambdaFunction:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Description: "Get offered instance types offered in a region"
+            FunctionName: "GetInstanceTypes"
+            Handler: "index.handler"
+            Architectures: 
+              - "x86_64"
+            CodeUri: "lambdas/GetInstanceTypes.zip"
+            MemorySize: 1024
+            Role: !GetAtt GetInstanceTypesRole.Arn
+            Runtime: "nodejs18.x"
+            Timeout: 30
+
+    StoreRegionalUtilizationLambdaFunction:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Description: "Store as CloudWatch metric resulting utilization"
+            FunctionName: "StoreRegionalUtilization"
+            Handler: "index.handler"
+            Architectures: 
+              - "arm64"
+            CodeUri:  "lambdas/StoreRegionalUtilization.zip"
+            MemorySize: 128
+            Role: !GetAtt StoreRegionalUtilizationRole.Arn
+            Runtime: "nodejs18.x"
+            Timeout: 3
+
+    GetUsageLambdaFunction:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Description: "Identify in which regions there was EC2 usage yesterday"
+            FunctionName: "GetUsage"
+            Handler: "index.handler"
+            Architectures: 
+              - "x86_64"
+            CodeUri: "lambdas/GetUsage.zip"
+            MemorySize: 128
+            Role: !GetAtt GetUsageRole.Arn
+            Runtime: "nodejs18.x"
+            Timeout: 3
+
+    GetInstancesLambdaFunction:
+        Type: "AWS::Serverless::Function"
+        Properties:
+            Description: "Get List of currently existing EC2 instances"
+            FunctionName: "GetInstances"
+            Handler: "index.handler"
+            Architectures: 
+              - "x86_64"
+            CodeUri: "lambdas/GetInstances.zip"
+            MemorySize: 128
+            Role: !GetAtt GetInstancesRole.Arn
+            Runtime: "nodejs18.x"
+            Timeout: 3
+
+    AmazonEventBridgeSchedulerRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement":
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "scheduler.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+                    "Condition":
+                        "StringLike":
+                            "aws:SourceArn": !Sub "arn:aws:scheduler:${AWS::Region}:${AWS::AccountId}:schedule/default/*"
+                            "aws:SourceAccount": !Sub "${AWS::AccountId}"
+            
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref AmazonEventBridgeSchedulerExecutionPolicy
+
+    GetInstancesRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "lambda.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref CloudWatchLogsPolicy
+
+    GetInstanceTypesRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "lambda.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref CloudWatchLogsPolicy
+
+    GetUsageRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "lambda.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref CloudWatchLogsPolicy
+
+    GetInstanceUtilizationRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "lambda.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref CloudWatchLogsPolicy
+
+    StoreRegionalUtilizationRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "lambda.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref CloudWatchLogsPolicy
+
+    StepFunctionsGetUtilizationRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            Path: "/service-role/"
+            AssumeRolePolicyDocument:
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Effect": "Allow"
+                    "Principal": 
+                        "Service": "states.amazonaws.com"
+                    "Action": "sts:AssumeRole"
+            MaxSessionDuration: 3600
+            ManagedPolicyArns: 
+              - !Ref StepFunctionInvokeLambdasPolicy
+              - !Ref CloudWatchLogsDeliveryFullAccessPolicy
+
+
+    StepFunctionsStateMachine:
+        Type: "AWS::Serverless::StateMachine"
+        Properties:
+            Name: "GetUtilization"
+            DefinitionUri: step-function.json
+            DefinitionSubstitutions:
+                Region: !Sub  ${AWS::Region}
+                AccountId: !Sub ${AWS::AccountId}
+            Role: !GetAtt StepFunctionsGetUtilizationRole.Arn
+            Type: "STANDARD"
+            Logging: 
+                Destinations: 
+                  - 
+                    CloudWatchLogsLogGroup: 
+                        LogGroupArn: !GetAtt StepFunctionsStateMachinesLogGroup.Arn
+                IncludeExecutionData: true
+                Level: "ALL"
+
+    StepFunctionsStateMachinesLogGroup:
+        Type: "AWS::Logs::LogGroup"
+        Properties:
+            LogGroupName: "/aws/vendedlogs/states/GetUtilization-Logs"
+            RetentionInDays: 30
+            KmsKeyId: !GetAtt BundleKey.Arn
+
+    IAMPolicy:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument: 
+                {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "VisualEditor0",
+                            "Effect": "Allow",
+                            "Action": "ce:GetCostAndUsage",
+                            "Resource": "*"
+                        }
+                    ]
+                }
+            Roles: 
+              - !Ref  GetUsageRole
+            PolicyName: "AllowGetCostAndUsage"
+
+    IAMPolicy2:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument: 
+                Version: "2012-10-17"
+                Statement: 
+                        Sid: "VisualEditor0"
+                        Effect: "Allow"
+                        Action: "ec2:DescribeInstanceTypes"
+                        Resource: "*"
+            Roles: 
+              - !Ref GetInstanceTypesRole
+            PolicyName: "DescribeInstanceTypes"
+
+    IAMPolicy3:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument:
+                Version: "2012-10-17"
+                Statement: 
+                    Sid: "VisualEditor0"
+                    Effect: "Allow"
+                    Action: "ec2:DescribeInstances"
+                    Resource: "*"
+            Roles: 
+              - !Ref GetInstancesRole
+            PolicyName: "DescribeInstances"    
+
+    IAMPolicy4:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument: 
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Sid": "VisualEditor0"
+                    "Effect": "Allow"
+                    "Action": "cloudwatch:GetMetricStatistics"
+                    "Resource": "*"
+            Roles: 
+              - !Ref GetInstanceUtilizationRole
+            PolicyName: "GetMetricStatistics"              
+
+    IAMPolicy5:
+        Type: "AWS::IAM::Policy"
+        Properties:
+            PolicyDocument: 
+                "Version": "2012-10-17"
+                "Statement": 
+                    "Sid": "VisualEditor0"
+                    "Effect": "Allow"
+                    "Action": "cloudwatch:PutMetricData"
+                    "Resource": "*"
+            Roles: 
+              - !Ref StoreRegionalUtilizationRole
+            PolicyName: "PutMetricData"            
+
+    CloudWatchDashboard:
+        Type: "AWS::CloudWatch::Dashboard"
+        Properties:
+            DashboardName: "Sustainability"
+            DashboardBody: !Sub "{\"widgets\":[{\"type\":\"metric\",\"x\":0,\"y\":0,\"width\":11,\"height\":10,\"properties\":{\"metrics\":[[{\"expression\":\"SEARCH('{Sustainability/KPI,region,service,type}', 'Average', 86400)\",\"id\":\"e1\",\"region\":\"${AWS::Region}\"}]],\"view\":\"timeSeries\",\"stacked\":false,\"region\":\"${AWS::Region}\",\"stat\":\"Average\",\"period\":300,\"start\":\"-PT168H\",\"title\":\"EC2 CPU Utilization\",\"end\":\"PT0H\",\"yAxis\":{\"left\":{\"showUnits\":false,\"label\":\"%\"},\"right\":{\"showUnits\":false}}}}]}"
+
+    DailyScheduler:
+        Type: AWS::Scheduler::Schedule
+        Properties: 
+            Description: "Run Step Function Daily"
+            FlexibleTimeWindow: 
+                MaximumWindowInMinutes: 120
+                Mode: "FLEXIBLE"
+            GroupName: default
+            ScheduleExpression: cron(0 5 ? * * *)
+            State: "ENABLED"
+            Target: 
+                Arn: !GetAtt StepFunctionsStateMachine.Arn
+                RoleArn: !GetAtt AmazonEventBridgeSchedulerRole.Arn
+    BundleKey:
+        Type: AWS::KMS::Key
+        Properties: 
+            Enabled: True
+            EnableKeyRotation: True
+            KeyPolicy:
+                Version: 2012-10-17
+                Id: key-default-1
+                Statement:
+                  - Sid: Enable IAM User Permissions
+                    Effect: Allow
+                    Principal:
+                        AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                    Action: 'kms:*'
+                    Resource: '*'
+                  - Sid: Allow use of the key
+                    Effect: Allow
+                    Principal:
+                        Service: !Sub "logs.${AWS::Region}.amazonaws.com"
+                    Action:
+                        - 'kms:DescribeKey'
+                        - 'kms:Encrypt'
+                        - 'kms:Decrypt'
+                        - 'kms:ReEncrypt*'
+                        - 'kms:GenerateDataKey'
+                        - 'kms:GenerateDataKeyWithoutPlaintext'
+                    Resource: '*'
+
+
