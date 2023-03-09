@@ -1,10 +1,5 @@
 import { CloudWatchClient, GetMetricStatisticsCommand } from '@aws-sdk/client-cloudwatch'
 
-const input = {
-  instanceType: 't2.micro',
-  vCPUs: 1
-}
-
 function naiveRound (num, decimalPlaces = 0) {
   const p = Math.pow(10, decimalPlaces)
   return Math.round(num * p) / p

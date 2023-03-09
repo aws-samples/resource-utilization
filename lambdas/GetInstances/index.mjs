@@ -10,11 +10,10 @@ async function getInstances (region) {
   })
   const params = {}
   const command = new DescribeInstancesCommand(params)
-  let res
-  res = await client.send(command)
+  const res = await client.send(command)
   console.log('res: ', res)
   for (const reserve of res.Reservations) {
-    for (const instance of reserve.Instances) {
+    for (const instance of reserve.Instances) {
       console.log(instance.InstanceId, instance.InstanceType)
       instances.push({ id: instance.InstanceId, type: instance.InstanceType })
     }
