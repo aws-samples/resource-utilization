@@ -10,6 +10,8 @@ Be sure to:
 ## Deployment
 
 TODO 
+SAM CLI Deps / https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
+deploy.sh script
 
 ## Security
 
