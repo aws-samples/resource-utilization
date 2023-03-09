@@ -1,3 +1,6 @@
+// Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+// SPDX-License-Identifier: MIT-0
+
 import { CloudWatchClient, PutMetricDataCommand } from '@aws-sdk/client-cloudwatch'
 const client = new CloudWatchClient()
 
