@@ -1,0 +1,188 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Get Usage",
+    "States": {
+      "Get Usage": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::lambda:invoke",
+        "OutputPath": "$.Payload",
+        "Parameters": {
+          "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:GetUsage:$LATEST"
+        },
+        "Retry": [
+          {
+            "ErrorEquals": [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds": 2,
+            "MaxAttempts": 6,
+            "BackoffRate": 2
+          }
+        ],
+        "Next": "Has Usage?"
+      },
+      "Has Usage?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "And": [
+              {
+                "Variable": "$",
+                "IsPresent": true
+              },
+              {
+                "Variable": "$[0]",
+                "IsPresent": true
+              }
+            ],
+            "Next": "Regions"
+          }
+        ],
+        "Default": "Stop"
+      },
+      "Regions": {
+        "Type": "Map",
+        "ItemProcessor": {
+          "ProcessorConfig": {
+            "Mode": "INLINE"
+          },
+          "StartAt": "Get Instance Types",
+          "States": {
+            "Get Instance Types": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:GetInstanceTypes:$LATEST",
+                "Payload.$": "$"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 6,
+                  "BackoffRate": 2
+                }
+              ],
+              "Next": "Get Instances"
+            },
+            "Get Instances": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload.$": "$",
+                "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:GetInstances:$LATEST"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 6,
+                  "BackoffRate": 2
+                }
+              ],
+              "Next": "Map"
+            },
+            "Map": {
+              "Type": "Map",
+              "ItemProcessor": {
+                "ProcessorConfig": {
+                  "Mode": "INLINE"
+                },
+                "StartAt": "Get Instance Utilization",
+                "States": {
+                  "Get Instance Utilization": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "OutputPath": "$.Payload",
+                    "Parameters": {
+                      "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:GetInstanceUtilization:$LATEST",
+                      "Payload": {
+                        "id.$": "$.instance.id",
+                        "type.$": "$.instance.type",
+                        "region.$": "$.region",
+                        "instanceTypes.$": "$.instanceTypes"
+                      }
+                    },
+                    "Retry": [
+                      {
+                        "ErrorEquals": [
+                          "Lambda.ServiceException",
+                          "Lambda.AWSLambdaException",
+                          "Lambda.SdkClientException",
+                          "Lambda.TooManyRequestsException"
+                        ],
+                        "IntervalSeconds": 2,
+                        "MaxAttempts": 6,
+                        "BackoffRate": 2
+                      }
+                    ],
+                    "End": true
+                  }
+                }
+              },
+              "ItemsPath": "$.instances",
+              "Parameters": {
+                "instance.$": "$$.Map.Item.Value",
+                "instanceTypes.$": "$.instanceTypes",
+                "region.$": "$.region"
+              },
+              "Next": "StoreRegionalUtilization",
+              "ResultPath": "$.result"
+            },
+            "StoreRegionalUtilization": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "OutputPath": "$.Payload",
+              "Parameters": {
+                "Payload": {
+                  "region.$": "$.region",
+                  "metrics.$": "$.result"
+                },
+                "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:StoreRegionalUtilization:$LATEST"
+              },
+              "Retry": [
+                {
+                  "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException",
+                    "Lambda.TooManyRequestsException"
+                  ],
+                  "IntervalSeconds": 2,
+                  "MaxAttempts": 6,
+                  "BackoffRate": 2
+                }
+              ],
+              "End": true
+            }
+          }
+        },
+        "Parameters": {
+          "region.$": "$$.Map.Item.Value"
+        },
+        "Next": "Pass"
+      },
+      "Pass": {
+        "Type": "Pass",
+        "End": true
+      },
+      "Stop": {
+        "Type": "Succeed"
+      }
+    }
+  }
