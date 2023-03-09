@@ -5,6 +5,9 @@ module.exports = {
   },
   extends: 'standard',
   overrides: [
+    {
+      files: ['lambdas/**/*.mjs']
+    }
   ],
   parserOptions: {
     ecmaVersion: 'latest',
