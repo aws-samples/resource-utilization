@@ -17,11 +17,8 @@ async function getInstanceTypes (region) {
     if (res && res.NextToken) {
       params.NextToken = res.NextToken
     }
-    console.log(1)
     const command = new DescribeInstanceTypesCommand(params)
-    console.log(2)
     res = await client.send(command)
-    console.log(3)
     for (const instance of res.InstanceTypes) {
       instances[instance.InstanceType] = instance.VCpuInfo.DefaultVCpus
     }

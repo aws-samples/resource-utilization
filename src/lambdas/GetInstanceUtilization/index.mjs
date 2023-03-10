@@ -35,7 +35,6 @@ async function getInstanceUtilization (instanceId, region) {
   let res
   if (stat.Datapoints[0]) {
     res = stat.Datapoints[0].Average
-    console.log(res)
   }
   return naiveRound(res, 4)
 }
@@ -45,6 +44,5 @@ export const handler = async (event) => {
   const vcpus = event.instanceTypes[event.type]
   const utilization = await getInstanceUtilization(event.id, event.region)
   const res = { utilization, vcpus }
-  console.log(res)
   return res
 }
