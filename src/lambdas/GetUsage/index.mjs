@@ -43,6 +43,5 @@ export const handler = async (event) => {
       }
     }
   }
-  console.log([...regions])
   return [...regions]
 }
