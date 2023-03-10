@@ -31,7 +31,7 @@ Resources:
                     Effect: "Allow"
                     Action: "lambda:InvokeFunction"
                     Resource:
-                        -  !Sub  "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceTypesLambdaFunction}:*"
+                        -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceTypesLambdaFunction}:*"
                         -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetInstanceTypesLambdaFunction}"
                         -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetUsageLambdaFunction}:*"
                         -  !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${GetUsageLambdaFunction}"
@@ -53,7 +53,7 @@ Resources:
                     Effect: "Allow"
                     Action: "logs:CreateLogGroup"
                     Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
-                  - Sid: CreateLogEvents                     
+                  - Sid: CreateLogEvents
                     Effect: "Allow"
                     Action: 
                         - "logs:CreateLogStream"
@@ -81,7 +81,7 @@ Resources:
                 - id: W89
                   reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
                 - id: W92
-                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"
         Properties:
             Description: "Get Daily average EC2 instance utilization for a specific instance id"
             FunctionName: "GetInstanceUtilization"
@@ -104,7 +104,7 @@ Resources:
                 - id: W89
                   reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
                 - id: W92
-                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"
         Properties:
             Description: "Get offered instance types offered in a region"
             FunctionName: "GetInstanceTypes"
@@ -127,14 +127,14 @@ Resources:
                 - id: W89
                   reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
                 - id: W92
-                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"
         Properties:
             Description: "Store as CloudWatch metric resulting utilization"
             FunctionName: "StoreRegionalUtilization"
             Handler: "index.handler"
             Architectures: 
               - "arm64"
-            CodeUri:  "lambdas/StoreRegionalUtilization.zip"
+            CodeUri: "lambdas/StoreRegionalUtilization.zip"
             MemorySize: 128
             Role: !GetAtt StoreRegionalUtilizationRole.Arn
             Runtime: "nodejs18.x"
@@ -150,7 +150,7 @@ Resources:
                 - id: W89
                   reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
                 - id: W92
-                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"
         Properties:
             Description: "Identify in which regions there was EC2 usage yesterday"
             FunctionName: "GetUsage"
@@ -173,7 +173,7 @@ Resources:
                 - id: W89
                   reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
                 - id: W92
-                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"
         Properties:
             Description: "Get List of currently existing EC2 instances"
             FunctionName: "GetInstances"
@@ -305,7 +305,7 @@ Resources:
             Name: "GetUtilization"
             DefinitionUri: step-function.json
             DefinitionSubstitutions:
-                Region: !Sub  ${AWS::Region}
+                Region: !Sub ${AWS::Region}
                 AccountId: !Sub ${AWS::AccountId}
             Role: !GetAtt StepFunctionsGetUtilizationRole.Arn
             Type: "STANDARD"
@@ -345,7 +345,7 @@ Resources:
                     ]
                 }
             Roles: 
-              - !Ref  GetUsageRole
+              - !Ref GetUsageRole
             PolicyName: "AllowGetCostAndUsage"
 
     IAMPolicy2:
@@ -354,7 +354,7 @@ Resources:
             cfn_nag:
                 rules_to_suppress:
                 - id: W12
-                  reason: "Action DescribeInstanceTypes doesn't require resources but Cloudformation requires an explicit wildcard in place"        
+                  reason: "Action DescribeInstanceTypes doesn't require resources but Cloudformation requires an explicit wildcard in place"
         Properties:
             PolicyDocument: 
                 Version: "2012-10-17"
@@ -373,7 +373,7 @@ Resources:
             cfn_nag:
                 rules_to_suppress:
                 - id: W12
-                  reason: "Action DescribeInstances doesn't require resources but Cloudformation requires an explicit wildcard in place"          
+                  reason: "Action DescribeInstances doesn't require resources but Cloudformation requires an explicit wildcard in place"
         Properties:
             PolicyDocument:
                 Version: "2012-10-17"
@@ -384,7 +384,7 @@ Resources:
                     Resource: "*"
             Roles: 
               - !Ref GetInstancesRole
-            PolicyName: "DescribeInstances"    
+            PolicyName: "DescribeInstances"
 
     IAMPolicy4:
         Type: "AWS::IAM::Policy"
@@ -392,7 +392,7 @@ Resources:
             cfn_nag:
                 rules_to_suppress:
                 - id: W12
-                  reason: "Action GetMetricStatistics doesn't require resources but Cloudformation requires an explicit wildcard in place"                
+                  reason: "Action GetMetricStatistics doesn't require resources but Cloudformation requires an explicit wildcard in place"
         Properties:
             PolicyDocument: 
                 "Version": "2012-10-17"
@@ -403,7 +403,7 @@ Resources:
                     "Resource": "*"
             Roles: 
               - !Ref GetInstanceUtilizationRole
-            PolicyName: "GetMetricStatistics"              
+            PolicyName: "GetMetricStatistics"
 
     IAMPolicy5:
         Type: "AWS::IAM::Policy"
@@ -411,7 +411,7 @@ Resources:
             cfn_nag:
                 rules_to_suppress:
                 - id: W12
-                  reason: "Action PutMetricData doesn't require resources but Cloudformation requires an explicit wildcard in place"                
+                  reason: "Action PutMetricData doesn't require resources but Cloudformation requires an explicit wildcard in place"
         Properties:
             PolicyDocument: 
                 "Version": "2012-10-17"
@@ -422,7 +422,7 @@ Resources:
                     "Resource": "*"
             Roles: 
               - !Ref StoreRegionalUtilizationRole
-            PolicyName: "PutMetricData"            
+            PolicyName: "PutMetricData"
 
     CloudWatchDashboard:
         Type: "AWS::CloudWatch::Dashboard"
