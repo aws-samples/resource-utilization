@@ -4,6 +4,11 @@ Description: ""
 Resources:
     CloudWatchLogsDeliveryFullAccessPolicy:
         Type: "AWS::IAM::ManagedPolicy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W13
+                  reason: "These actions don't require resources but Cloudformation requires an explicit wildcard in place"        
         Properties:
             Path: "/service-role/"
             PolicyDocument: 
