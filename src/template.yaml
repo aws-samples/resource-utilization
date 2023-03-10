@@ -73,6 +73,15 @@ Resources:
 
     GetInstanceUtilizationLambdaFunction:
         Type: "AWS::Serverless::Function"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W58
+                  reason: "False positive: Lambda function has permissions to write logs as the role has attached the managed policy CloudWatchLogsPolicy"
+                - id: W89
+                  reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
+                - id: W92
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
         Properties:
             Description: "Get Daily average EC2 instance utilization for a specific instance id"
             FunctionName: "GetInstanceUtilization"
@@ -87,6 +96,15 @@ Resources:
 
     GetInstanceTypesLambdaFunction:
         Type: "AWS::Serverless::Function"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W58
+                  reason: "False positive: Lambda function has permissions to write logs as the role has attached the managed policy CloudWatchLogsPolicy"
+                - id: W89
+                  reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
+                - id: W92
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
         Properties:
             Description: "Get offered instance types offered in a region"
             FunctionName: "GetInstanceTypes"
@@ -101,6 +119,15 @@ Resources:
 
     StoreRegionalUtilizationLambdaFunction:
         Type: "AWS::Serverless::Function"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W58
+                  reason: "False positive: Lambda function has permissions to write logs as the role has attached the managed policy CloudWatchLogsPolicy"
+                - id: W89
+                  reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
+                - id: W92
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
         Properties:
             Description: "Store as CloudWatch metric resulting utilization"
             FunctionName: "StoreRegionalUtilization"
@@ -115,6 +142,15 @@ Resources:
 
     GetUsageLambdaFunction:
         Type: "AWS::Serverless::Function"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W58
+                  reason: "False positive: Lambda function has permissions to write logs as the role has attached the managed policy CloudWatchLogsPolicy"
+                - id: W89
+                  reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
+                - id: W92
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
         Properties:
             Description: "Identify in which regions there was EC2 usage yesterday"
             FunctionName: "GetUsage"
@@ -129,6 +165,15 @@ Resources:
 
     GetInstancesLambdaFunction:
         Type: "AWS::Serverless::Function"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W58
+                  reason: "False positive: Lambda function has permissions to write logs as the role has attached the managed policy CloudWatchLogsPolicy"
+                - id: W89
+                  reason: "Using this lambda within a VPC just adds delay and cost overhead, as there are no VPC resources involved in the process"
+                - id: W92
+                  reason: "Using ReservedConcurrentExecutions for a lambda function that is invoked on a daily process is over provisioning resources"                                    
         Properties:
             Description: "Get List of currently existing EC2 instances"
             FunctionName: "GetInstances"
@@ -281,6 +326,11 @@ Resources:
 
     IAMPolicy:
         Type: "AWS::IAM::Policy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W12
+                  reason: "Action GetCostAndUsage doesn't require resources but Cloudformation requires an explicit wildcard in place"
         Properties:
             PolicyDocument: 
                 {
@@ -300,6 +350,11 @@ Resources:
 
     IAMPolicy2:
         Type: "AWS::IAM::Policy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W12
+                  reason: "Action DescribeInstanceTypes doesn't require resources but Cloudformation requires an explicit wildcard in place"        
         Properties:
             PolicyDocument: 
                 Version: "2012-10-17"
@@ -314,6 +369,11 @@ Resources:
 
     IAMPolicy3:
         Type: "AWS::IAM::Policy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W12
+                  reason: "Action DescribeInstances doesn't require resources but Cloudformation requires an explicit wildcard in place"          
         Properties:
             PolicyDocument:
                 Version: "2012-10-17"
@@ -328,6 +388,11 @@ Resources:
 
     IAMPolicy4:
         Type: "AWS::IAM::Policy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W12
+                  reason: "Action GetMetricStatistics doesn't require resources but Cloudformation requires an explicit wildcard in place"                
         Properties:
             PolicyDocument: 
                 "Version": "2012-10-17"
@@ -342,6 +407,11 @@ Resources:
 
     IAMPolicy5:
         Type: "AWS::IAM::Policy"
+        Metadata:
+            cfn_nag:
+                rules_to_suppress:
+                - id: W12
+                  reason: "Action PutMetricData doesn't require resources but Cloudformation requires an explicit wildcard in place"                
         Properties:
             PolicyDocument: 
                 "Version": "2012-10-17"
