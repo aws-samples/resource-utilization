@@ -23,3 +23,4 @@ for lambda in "${arr_variable[@]}"
 do
     rm lambdas/$lambda.zip
 done
+rm -rf .aws-sam
