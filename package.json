@@ -1,11 +1,11 @@
 {
   "name": "resource-utilization",
   "version": "1.0.0",
-  "description": "TODO: Fill this README out!",
+  "description": "Simple version of an account wide resource utilization metric and dashboard, to get overall insights on actually how much room for optimization is available.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Gonzalo Vazquez <gevs@amazon.com>",
   "license": "ISC",
   "dependencies": {
     "eslint-standard": "^1.0.2"
