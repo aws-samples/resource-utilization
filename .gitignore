@@ -1,3 +1,4 @@
 node_modules
 src/.aws-sam
 aggregated_results.txt
+.idea

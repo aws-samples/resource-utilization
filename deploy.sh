@@ -7,7 +7,7 @@ arr_variable=("GetInstances" "GetInstanceTypes" "GetInstanceUtilization" "GetUsa
 ## now loop through the above array
 for lambda in "${arr_variable[@]}"
 do
-    cd "lambdas/$lambda"; npm ci; zip ../$lambda.zip *; cd ../..
+    cd "lambdas/$lambda"; npm ci; zip ../"$lambda.zip" *; cd ../..
 done
 
 
@@ -21,6 +21,6 @@ sam deploy --stack-name Utilization --resolve-s3 --capabilities CAPABILITY_NAMED
 # cleanup
 for lambda in "${arr_variable[@]}"
 do
-    rm lambdas/$lambda.zip
+    rm "lambdas/$lambda.zip"
 done
 rm -rf .aws-sam
