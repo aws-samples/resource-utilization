@@ -9,6 +9,10 @@ As a baseline, initial version considers only Amazon EC2 service CPU Utilization
 * Setup AWS credentials for your environment: [instructions here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 * Install AWS SAM CLI: [instructions here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
+## Architecture
+
+![Architecture Diagram](assets/resource-utilization.drawio.png)
+
 ## Deployment
 
 Inside your terminal, execute `deploy.sh` to pack and deploy the `template.yaml` AWS CloudFormation template:
