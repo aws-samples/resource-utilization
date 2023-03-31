@@ -14,16 +14,16 @@ async function getInstances (region) {
   const params = {}
   let res
   do {
-        if (res && res.NextToken) {
-          params.NextToken = res.NextToken
-        }
-      const command = new DescribeInstancesCommand(params)
-      res = await client.send(command)
-      for (const reserve of res.Reservations) {
-        for (const instance of reserve.Instances) {
-          instances.push({ id: instance.InstanceId, type: instance.InstanceType })
-        }
+    if (res && res.NextToken) {
+      params.NextToken = res.NextToken
+    }
+    const command = new DescribeInstancesCommand(params)
+    res = await client.send(command)
+    for (const reserve of res.Reservations) {
+      for (const instance of reserve.Instances) {
+        instances.push({ id: instance.InstanceId, type: instance.InstanceType })
       }
+    }
   } while (res.NextToken)
   return instances
 }
