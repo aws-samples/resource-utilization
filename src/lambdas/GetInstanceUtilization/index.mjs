@@ -8,7 +8,7 @@ function naiveRound (num, decimalPlaces = 0) {
   return Math.round(num * p) / p
 }
 
-async function getInstanceUtilization (instanceId, region) {
+async function getInstanceUtilization (id, region) {
   const client = new CloudWatchClient({ region })
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -26,7 +26,7 @@ async function getInstanceUtilization (instanceId, region) {
     Dimensions: [
       {
         Name: 'InstanceId',
-        Value: instanceId
+        Value: id
       }
     ]
   }
