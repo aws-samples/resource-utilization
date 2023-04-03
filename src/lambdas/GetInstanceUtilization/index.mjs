@@ -12,7 +12,8 @@ async function getInstanceUtilization (instanceId, region) {
   const client = new CloudWatchClient({ region })
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
   yesterday.setHours(0, 0, 0, 0)
 
   const params = {
