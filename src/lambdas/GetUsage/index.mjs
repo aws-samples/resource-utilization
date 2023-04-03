@@ -33,15 +33,22 @@ const params = {
 }
 
 export const handler = async (event) => {
-  const command = new GetCostAndUsageCommand(params)
-  const res = await client.send(command)
   const regions = new Set()
-  for (const result of res.ResultsByTime) {
-    for (const group of result.Groups) {
-      for (const key of group.Keys) {
-        regions.add(key)
+  let res
+  do {
+    if (res && res.NextToken) {
+      params.NextToken = res.NextToken
+    }
+    const command = new GetCostAndUsageCommand(params)
+    res = await client.send(command)
+
+    for (const result of res.ResultsByTime) {
+      for (const group of result.Groups) {
+        for (const key of group.Keys) {
+          regions.add(key)
+        }
       }
     }
-  }
+  } while (res.NextToken)
   return [...regions]
 }

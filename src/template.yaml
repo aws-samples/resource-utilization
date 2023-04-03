@@ -189,7 +189,7 @@ Resources:
             MemorySize: 128
             Role: !GetAtt GetInstancesRole.Arn
             Runtime: "nodejs18.x"
-            Timeout: 3
+            Timeout: 10
 
     AmazonEventBridgeSchedulerRole:
         Type: "AWS::IAM::Role"
