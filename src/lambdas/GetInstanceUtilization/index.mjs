@@ -8,24 +8,25 @@ function naiveRound (num, decimalPlaces = 0) {
   return Math.round(num * p) / p
 }
 
-async function getInstanceUtilization (instanceId, region) {
+async function getInstanceUtilization (id, region, Namespace, MetricName, DimensionName) {
   const client = new CloudWatchClient({ region })
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
   yesterday.setHours(0, 0, 0, 0)
 
   const params = {
     StartTime: yesterday,
     EndTime: today,
-    MetricName: 'CPUUtilization',
-    Namespace: 'AWS/EC2',
+    MetricName,
+    Namespace,
     Period: 60 * 60 * 24, // one day
     Statistics: ['Average'],
     Dimensions: [
       {
-        Name: 'InstanceId',
-        Value: instanceId
+        Name: DimensionName,
+        Value: id
       }
     ]
   }
@@ -42,7 +43,7 @@ async function getInstanceUtilization (instanceId, region) {
 export const handler = async (event) => {
   console.log(event)
   const vcpus = event.instanceTypes[event.type]
-  const utilization = await getInstanceUtilization(event.id, event.region)
+  const utilization = await getInstanceUtilization(event.id, event.region, event.Namespace, event.MetricName, event.DimensionName)
   const res = { utilization, vcpus }
   return res
 }

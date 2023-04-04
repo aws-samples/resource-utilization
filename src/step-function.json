@@ -115,7 +115,10 @@
                         "id.$": "$.instance.id",
                         "type.$": "$.instance.type",
                         "region.$": "$.region",
-                        "instanceTypes.$": "$.instanceTypes"
+                        "instanceTypes.$": "$.instanceTypes",
+                        "Namespace": "AWS/EC2",
+                        "MetricName": "CPUUtilization", 
+                        "DimensionName": "InstanceId"
                       }
                     },
                     "Retry": [
