@@ -90,10 +90,10 @@ async function getInstanceUtilization (event) {
       }
     }
 
-    const avg = sum / instanceBaseline / count
+    res = sum / instanceBaseline / count
     console.log('count', count)
     console.log('sum', sum)
-    console.log('avg', avg)
+    console.log('avg', res)
   } else {
     const params = {
       StartTime: yesterday,
