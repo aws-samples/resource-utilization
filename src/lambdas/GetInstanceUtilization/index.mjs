@@ -41,7 +41,7 @@ function naiveRound (num, decimalPlaces = 0) {
 }
 
 async function getInstanceUtilization (event) {
-  const client = new CloudWatchClient({ region: event.event })
+  const client = new CloudWatchClient({ region: event.region })
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const yesterday = new Date()
