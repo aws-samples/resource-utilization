@@ -404,11 +404,13 @@ Resources:
                 "Statement": 
                     "Sid": "VisualEditor0"
                     "Effect": "Allow"
-                    "Action": "cloudwatch:GetMetricStatistics"
+                    "Action":
+                        - "cloudwatch:GetMetricStatistics"
+                        - "cloudwatch:GetMetricData"
                     "Resource": "*"
             Roles: 
               - !Ref GetInstanceUtilizationRole
-            PolicyName: "GetMetricStatistics"
+            PolicyName: "GetMetrics"
 
     IAMPolicy5:
         Type: "AWS::IAM::Policy"
