@@ -6,6 +6,9 @@ import {
   DescribeInstanceTypesCommand
 } from '@aws-sdk/client-ec2'
 
+// describe ec2 instance types
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/classes/describeinstancetypescommand.html
+
 async function getInstanceTypes (region) {
   const instances = {}
   const params = {}

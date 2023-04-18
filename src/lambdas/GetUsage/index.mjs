@@ -39,6 +39,7 @@ export const handler = async (event) => {
     if (res && res.NextToken) {
       params.NextToken = res.NextToken
     }
+    // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-cost-explorer/classes/getcostandusagecommand.html
     const command = new GetCostAndUsageCommand(params)
     res = await client.send(command)
 
