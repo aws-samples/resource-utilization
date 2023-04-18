@@ -435,7 +435,7 @@ Resources:
         Type: "AWS::CloudWatch::Dashboard"
         Properties:
             DashboardName: "Sustainability"
-            DashboardBody: !Sub "{\"widgets\":[{\"type\":\"metric\",\"x\":0,\"y\":0,\"width\":11,\"height\":10,\"properties\":{\"metrics\":[[{\"expression\":\"SEARCH('{Sustainability/KPI,region,service,type}', 'Average', 86400)\",\"id\":\"e1\",\"region\":\"${AWS::Region}\"}]],\"view\":\"timeSeries\",\"stacked\":false,\"region\":\"${AWS::Region}\",\"stat\":\"Average\",\"period\":300,\"start\":\"-PT168H\",\"title\":\"EC2 CPU Utilization\",\"end\":\"PT0H\",\"yAxis\":{\"left\":{\"showUnits\":false,\"label\":\"%\"},\"right\":{\"showUnits\":false}}}}]}"
+            DashboardBody: !Sub "{\"widgets\":[{\"type\":\"metric\",\"x\":0,\"y\":0,\"width\":11,\"height\":10,\"properties\":{\"metrics\":[[{\"expression\":\"SEARCH('{Sustainability/KPI,region,service,type}', 'Average', 86400)\",\"id\":\"e1\",\"region\":\"${AWS::Region}\"}]],\"view\":\"timeSeries\",\"stacked\":false,\"region\":\"${AWS::Region}\",\"stat\":\"Average\",\"period\":300,\"start\":\"-PT168H\",\"title\":\"EC2 CPU Utilization\",\"end\":\"PT0H\",\"yAxis\":{\"left\":{\"showUnits\":true},\"right\":{\"showUnits\":false}}}}]}"
 
     DailyScheduler:
         Type: AWS::Scheduler::Schedule

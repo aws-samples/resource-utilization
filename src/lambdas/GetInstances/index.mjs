@@ -6,6 +6,8 @@ import {
   DescribeInstancesCommand
 } from '@aws-sdk/client-ec2'
 
+// describe ec2 instances
+// https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/classes/describeinstancescommand.html
 async function getInstances (region) {
   const instances = []
   const client = new EC2Client({

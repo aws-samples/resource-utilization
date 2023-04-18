@@ -5,6 +5,7 @@ import { CloudWatchClient, PutMetricDataCommand } from '@aws-sdk/client-cloudwat
 const client = new CloudWatchClient()
 
 async function putMetric (region, utilization) {
+  // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-cloudwatch/classes/putmetricdatacommand.html
   const command = new PutMetricDataCommand({
     MetricData: [
       {
@@ -23,7 +24,7 @@ async function putMetric (region, utilization) {
             Value: 'EC2'
           }
         ],
-        Unit: 'None',
+        Unit: 'Percent',
         Value: utilization
       }
     ],

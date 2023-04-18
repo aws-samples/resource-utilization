@@ -79,6 +79,7 @@ async function getInstanceUtilization (event) {
     }
     let count = 0
     let sum = 0
+    // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-cloudwatch/classes/getmetricdatacommand.html
     const command = new GetMetricDataCommand(params)
     const response = await client.send(command)
     console.log(JSON.stringify(response))
