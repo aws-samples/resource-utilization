@@ -24,7 +24,7 @@ async function putMetric (region, utilization) {
             Value: 'EC2'
           }
         ],
-        Unit: 'None',
+        Unit: 'Percent',
         Value: utilization
       }
     ],
