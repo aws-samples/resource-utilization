@@ -3,7 +3,7 @@
 This is just the first and most simple version of an account wide resource utilization metric & dashboard, to get overall 
 insights on actually how much room for optimization is available.
 
-As a baseline, initial version considers only Amazon EC2 service CPU Utilization.
+As a baseline, initial version considers only [Amazon EC2](https://aws.amazon.com/ec2/) service [CPU Utilization](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring_ec2.html).
 
 ## Requirements
 * Setup AWS credentials for your environment: [instructions here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
@@ -15,16 +15,16 @@ As a baseline, initial version considers only Amazon EC2 service CPU Utilization
 
 ## Deployment
 
-Inside your terminal, execute `deploy.sh` to pack and deploy the `template.yaml` AWS CloudFormation template:
+Inside your terminal, execute `deploy.sh` to pack and deploy the `template.yaml` [AWS CloudFormation](https://aws.amazon.com/cloudformation/) template:
 
 `./deploy.sh`
 
 ## Usage
 
-This template includes an AWS Step Function that orchestrates the whole metric gathering and aggregation process.
-It is triggered daily via an Amazon EventBridge rule, so that no manual intervention is needed to process the data.
+This template includes an [AWS Step Function](https://aws.amazon.com/step-functions/) that orchestrates the whole metric gathering and aggregation process.
+It is triggered daily via an [Amazon EventBridge](https://aws.amazon.com/eventbridge/) rule, so that no manual intervention is needed to process the data.
 
-Statistical data is stored per region as Amazon CloudWatch metrics and displayed in an Amazon CloudWatch Dashboard 
+Statistical data is stored per region as [Amazon CloudWatch metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/working_with_metrics.html) and displayed in an [Amazon CloudWatch Dashboard](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html) 
 available for your analysis.
 
 ![Sample Dashboard](assets/dashboard-screenshot.png)
