@@ -1,5 +1,26 @@
 #!/bin/bash
 
+if which npm ; then
+    echo "npm check succeeded"
+else
+   echo "npm not found"   
+   exit -1 
+fi
+
+if which sam ; then
+    echo "sam check succeeded"
+else
+   echo "sam not found"
+   exit -1
+fi
+
+if which zip ; then
+    echo "zip check succeeded"
+else
+   echo "zip not found"
+   exit -1
+fi
+
 cd src
 # Pack Lambda Functions
 arr_variable=("GetInstances" "GetInstanceTypes" "GetInstanceUtilization" "GetUsage" "StoreRegionalUtilization")
