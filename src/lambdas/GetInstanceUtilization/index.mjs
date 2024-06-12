@@ -83,6 +83,7 @@ async function getInstanceUtilization (event) {
     const command = new GetMetricDataCommand(params)
     const response = await client.send(command)
     console.log(JSON.stringify(response))
+    // TODO Check if results need pagination
     for (const res of response.MetricDataResults) {
       count += res.Values.length
       for (const val of res.Values) {
